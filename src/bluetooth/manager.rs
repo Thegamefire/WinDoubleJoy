@@ -109,11 +109,16 @@ impl BluetoothManager {
                 }
                 JOYCONRIGHT_UUID => {
                     info!("right joycon found");
-                    peripheral.subscribe(&characteristic).await.unwrap();
-                    let mut stream = peripheral.notifications().await.unwrap();
-                    while let Some(msg) = stream.next().await {
-                        dbg!(msg);
-                    }
+                    peripheral.subscribe(&characteristic).await?;
+                    let mut stream = peripheral.notifications().await?;
+                    // spawn a thread to listen to the message stream
+                    tokio::spawn(async move {
+                        info!("right joycon tread started");
+                        while let Some(msg) = stream.next().await {
+                            dbg!(msg);
+                        }
+                        info!("right joycon thread ended");
+                    });
                 }
                 _ => debug!("skipped characteristic {}", characteristic),
             }
