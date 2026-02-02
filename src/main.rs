@@ -5,6 +5,8 @@ use btleplug::platform::{Adapter, Manager, Peripheral};
 use futures::stream::StreamExt;
 use uuid::uuid;
 
+pub mod bluetooth;
+
 async fn get_central(manager: &Manager) -> Adapter {
     let adapters = manager.adapters().await.unwrap();
     adapters.into_iter().nth(0).unwrap()
@@ -12,7 +14,7 @@ async fn get_central(manager: &Manager) -> Adapter {
 
 fn get_command_characteristic(peripheral: &Peripheral) -> Option<Characteristic> {
     for characteristic in peripheral.characteristics() {
-        if characteristic.uuid == uuid!("649d4ac9-8eb7-4e6c-af44-1ea54fe5f005")  {
+        if characteristic.uuid == uuid!("649d4ac9-8eb7-4e6c-af44-1ea54fe5f005") {
             return Some(characteristic);
         }
     }
@@ -40,7 +42,7 @@ async fn main() {
                         == [
                             1, 0, 3, 126, 5, 103, 32, 0, 1, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0,
                             0, 0,
-                        ] 
+                        ]
                 {
                     central
                         .peripheral(&id)
@@ -61,8 +63,7 @@ async fn main() {
             CentralEvent::DeviceConnected(id) => {
                 let peripheral = central.peripheral(&id).await.unwrap();
                 for characteristic in peripheral.characteristics() {
-                    if characteristic.service_uuid
-                        == uuid!("cc1bbbb5-7354-4d32-a716-a81cb241a32a") 
+                    if characteristic.service_uuid == uuid!("cc1bbbb5-7354-4d32-a716-a81cb241a32a")
                     {
                         // JoyConLeft
                         peripheral.subscribe(&characteristic).await.unwrap();
@@ -78,7 +79,7 @@ async fn main() {
                             .await
                             .unwrap();
                     } else if characteristic.service_uuid
-                        == uuid!("d5a9e01e-2ffc-4cca-b20c-8b67142bf442") 
+                        == uuid!("d5a9e01e-2ffc-4cca-b20c-8b67142bf442")
                     {
                         // JoyConRight
                         peripheral.subscribe(&characteristic).await.unwrap();
