@@ -90,22 +90,24 @@ impl BluetoothManager {
             match characteristic.service_uuid {
                 JOYCONLEFT_UUID => {
                     info!("left joycon found");
-                    peripheral.subscribe(&characteristic).await.unwrap();
-                    peripheral
-                        .write(
-                            &peripheral
-                                .characteristics()
-                                .iter()
-                                .find(|ch| ch.uuid == COMMAND_CHARACTERISTIC_UUID)
-                                .unwrap(),
-                            &[
-                                0x09, 0x91, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0b1001, 0x00, 0x00,
-                                0x00, 0x00, 0x00, 0x00, 0x00,
-                            ],
-                            WriteType::WithoutResponse,
-                        )
-                        .await
-                        .unwrap();
+                    peripheral.subscribe(&characteristic).await?;
+                    if let Some(command_characteristic) = peripheral
+                        .characteristics()
+                        .iter()
+                        .find(|ch| ch.uuid == COMMAND_CHARACTERISTIC_UUID)
+                    {
+                        info!("writing to command");
+                        peripheral
+                            .write(
+                                command_characteristic,
+                                &[
+                                    0x09, 0x91, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0b1001, 0x00,
+                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                ],
+                                WriteType::WithoutResponse,
+                            )
+                            .await?;
+                    }
                 }
                 JOYCONRIGHT_UUID => {
                     info!("right joycon found");
