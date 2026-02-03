@@ -6,7 +6,7 @@ use btleplug::{
     platform::{Adapter, Manager, PeripheralId},
 };
 use futures::StreamExt;
-use tracing::{debug, info, instrument};
+use tracing::{debug, info, instrument, trace};
 use uuid::{Uuid, uuid};
 
 const JOYCONLEFT_UUID: Uuid = uuid!("cc1bbbb5-7354-4d32-a716-a81cb241a32a");
@@ -49,16 +49,12 @@ impl BluetoothManager {
     pub async fn run_eventloop(&self) {
         info!("eventloop: start listening to adapter events");
         while let Some(event) = self.adapter.events().await.unwrap().next().await {
-            debug!("eventloop: found event: {:?}", event);
+            trace!("eventloop: event {:?}", event);
             match event {
                 ManufacturerDataAdvertisement {
                     id,
                     manufacturer_data,
                 } => {
-                    debug!(
-                        "eventloop: data for key 0x0553: {:?}",
-                        manufacturer_data.get(&0x0553)
-                    );
                     if let Some(data) = manufacturer_data.get(&0x0553)
                         && data == &NINTENDO_MANUFACTURER
                     {
