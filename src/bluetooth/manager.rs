@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::bluetooth::commands::Commands;
+use crate::bluetooth::{
+    commands::Commands,
+    state::{ControllerState, RightJoyConState},
+};
 use btleplug::{
     Result as BtleResult,
     api::{
@@ -125,7 +128,7 @@ impl BluetoothManager {
                     tokio::spawn(async move {
                         info!("right joycon tread started");
                         while let Some(msg) = stream.next().await {
-                            dbg!(msg);
+                            dbg!(RightJoyConState::from(msg));
                         }
                         info!("right joycon thread ended");
                     });
