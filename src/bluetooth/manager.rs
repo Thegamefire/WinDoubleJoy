@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use crate::bluetooth::commands::Commands;
 use btleplug::{
     Result as BtleResult,
     api::{Central, CentralEvent::*, Manager as _, Peripheral, ScanFilter, WriteType},
@@ -99,10 +100,15 @@ impl BluetoothManager {
                         peripheral
                             .write(
                                 command_characteristic,
-                                &[
-                                    0x09, 0x91, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0b1001, 0x00,
-                                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                ],
+                                &Commands::SetLED(0b1001).to_bytes(),
+                                WriteType::WithoutResponse,
+                            )
+                            .await?;
+
+                        peripheral
+                            .write(
+                                command_characteristic,
+                                &Commands::SendVibration.to_bytes(),
                                 WriteType::WithoutResponse,
                             )
                             .await?;
