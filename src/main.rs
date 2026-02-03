@@ -16,12 +16,14 @@ async fn main() {
 
     info!("starting");
     let manager = BluetoothManager::new().await;
+    info!("connecting to controller 1");
     let controller1 = manager.connect_controller().await.unwrap();
     dbg!(&controller1);
     if let Some(mut connection) = controller1 {
         let msg = connection.update_receiver.recv().await;
         dbg!(msg);
     }
+    info!("connecting to controller 2");
     let controller2 = manager.connect_controller().await.unwrap();
     dbg!(&controller2);
     if let Some(mut connection) = controller2 {
