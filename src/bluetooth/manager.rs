@@ -38,7 +38,10 @@ impl BluetoothManager {
     /// start scanning for bluetooth devices
     pub async fn start_scan(&self) {
         info!("scanning: starting");
-        self.adapter.start_scan(ScanFilter::default());
+        self.adapter
+            .start_scan(ScanFilter::default())
+            .await
+            .unwrap();
         info!("scanning: started");
     }
 
