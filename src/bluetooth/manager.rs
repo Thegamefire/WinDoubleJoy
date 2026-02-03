@@ -90,7 +90,7 @@ impl BluetoothManager {
         info!("handling a connection event for peripheral {id}");
         let peripheral = self.adapter.peripheral(&id).await?;
         for characteristic in peripheral.characteristics() {
-            match characteristic.service_uuid {
+            match characteristic.uuid {
                 JOYCONLEFT_UUID => {
                     info!("left joycon found");
                     peripheral.subscribe(&characteristic).await?;
