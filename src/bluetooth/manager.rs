@@ -3,7 +3,11 @@ use std::collections::HashMap;
 use crate::bluetooth::commands::Commands;
 use btleplug::{
     Result as BtleResult,
-    api::{Central, CentralEvent::*, Manager as _, Peripheral, ScanFilter, WriteType},
+    api::{
+        Central,
+        CentralEvent::{self, *},
+        Manager as _, Peripheral, ScanFilter, WriteType,
+    },
     platform::{Adapter, Manager, PeripheralId},
 };
 use futures::StreamExt;
@@ -59,10 +63,11 @@ impl BluetoothManager {
                     if let Some(data) = manufacturer_data.get(&0x0553)
                         && data == &NINTENDO_MANUFACTURER
                     {
-                        self.connect_to_peripheral(id).await.unwrap();
+                        self.connect_to_peripheral(&id).await.unwrap();
+                        self.handle_connect(&id).await.unwrap()
                     }
                 }
-                DeviceConnected(id) => self.handle_connect(id).await.unwrap(),
+                DeviceConnected(id) => info!("device connected"),
                 _ => {}
             }
         }
@@ -70,9 +75,9 @@ impl BluetoothManager {
     }
 
     /// connect to a peripheral using it's id
-    async fn connect_to_peripheral(&self, id: PeripheralId) -> BtleResult<()> {
+    async fn connect_to_peripheral(&self, id: &PeripheralId) -> BtleResult<()> {
         info!("connecting to peripheral with id {id}");
-        self.adapter.peripheral(&id).await?.connect().await?;
+        self.adapter.peripheral(id).await?.connect().await?;
         self.adapter
             .peripheral(&id)
             .await?
@@ -83,9 +88,9 @@ impl BluetoothManager {
     }
 
     /// handling for the connect event
-    async fn handle_connect(&self, id: PeripheralId) -> BtleResult<()> {
+    async fn handle_connect(&self, id: &PeripheralId) -> BtleResult<()> {
         info!("handling a connection event for peripheral {id}");
-        let peripheral = self.adapter.peripheral(&id).await?;
+        let peripheral = self.adapter.peripheral(id).await?;
         for characteristic in peripheral.characteristics() {
             match characteristic.uuid {
                 JOYCONLEFT_UUID => {
