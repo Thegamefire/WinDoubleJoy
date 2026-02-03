@@ -63,6 +63,7 @@ impl BluetoothManager {
                     }
                 }
                 DeviceConnected(id) => self.handle_connect(id).await.unwrap(),
+                DeviceUpdated(id) => self.handle_connect(id).await.unwrap(),
                 _ => {}
             }
         }
