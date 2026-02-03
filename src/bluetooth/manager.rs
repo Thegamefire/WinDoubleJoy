@@ -18,9 +18,7 @@ const JOYCONLEFT_UUID: Uuid = uuid!("cc1bbbb5-7354-4d32-a716-a81cb241a32a");
 const JOYCONRIGHT_UUID: Uuid = uuid!("d5a9e01e-2ffc-4cca-b20c-8b67142bf442");
 const COMMAND_CHARACTERISTIC_UUID: Uuid = uuid!("649d4ac9-8eb7-4e6c-af44-1ea54fe5f005");
 
-const NINTENDO_MANUFACTURER: [u8; 24] = [
-    1, 0, 3, 126, 5, 103, 32, 0, 1, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0,
-];
+const NINTENDO_MANUFACTURER_PREFIX: [u8; 5] = [1, 0, 3, 126, 5];
 
 #[derive(Debug)]
 pub struct BluetoothManager {
@@ -61,7 +59,7 @@ impl BluetoothManager {
                     manufacturer_data,
                 } => {
                     if let Some(data) = manufacturer_data.get(&0x0553)
-                        && data == &NINTENDO_MANUFACTURER
+                        && data.starts_with(&NINTENDO_MANUFACTURER_PREFIX)
                     {
                         self.connect_to_peripheral(&id).await.unwrap();
                         self.handle_connect(&id).await.unwrap()
