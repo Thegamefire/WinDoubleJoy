@@ -4,6 +4,7 @@ use crate::vigem;
 
 pub struct Vigem {
     controller: Xbox360Wired<Client>,
+    state: XGamepad,
 }
 
 impl Vigem {
@@ -16,5 +17,21 @@ impl Vigem {
         controller.wait_ready().unwrap();
 
         Self { controller }
+    }
+
+    fn read_loop(self, one: Receiver, two: Receiver) {
+        tokio::spawn(async move {
+            let pad = XGamepad::new();
+            while let (Some(msg_one), Some(msg_two)) = join!(one.recv(), two.recv()) {
+                if let Some(msg) = msg_one {
+                    msg.apply_to(&mut pad);
+                }
+                if let Some(msg) = msg_two {
+                    msg.apply_to(&mut pad);
+                }
+
+                self.controller.update(&pad);
+            }
+        });
     }
 }
