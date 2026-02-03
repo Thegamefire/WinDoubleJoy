@@ -1,5 +1,6 @@
 use btleplug::api::ValueNotification;
 
+#[derive(Debug)]
 pub enum ControllerState {
     Left(LeftJoyConState),
     Right(RightJoyConState),

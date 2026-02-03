@@ -16,6 +16,16 @@ async fn main() {
 
     info!("starting");
     let manager = BluetoothManager::new().await;
-    manager.start_scan().await;
-    manager.run_eventloop().await;
+    let controller1 = manager.connect_controller().await.unwrap();
+    dbg!(&controller1);
+    if let Some(mut connection) = controller1 {
+        let msg = connection.update_receiver.blocking_recv();
+        dbg!(msg);
+    }
+    let controller2 = manager.connect_controller().await.unwrap();
+    dbg!(&controller2);
+    if let Some(mut connection) = controller2 {
+        let msg = connection.update_receiver.blocking_recv();
+        dbg!(msg);
+    }
 }
