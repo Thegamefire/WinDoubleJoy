@@ -4,6 +4,8 @@ use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 use crate::bluetooth::manager::BluetoothManager;
 
 pub mod bluetooth;
+#[cfg(feature = "vigem")]
+pub mod vigem;
 
 #[tokio::main]
 async fn main() {
@@ -16,6 +18,7 @@ async fn main() {
 
     info!("starting");
     let manager = BluetoothManager::new().await;
+
     info!("connecting to controller 1");
     let controller1 = manager.connect_controller().await.unwrap();
     dbg!(&controller1);
@@ -23,6 +26,7 @@ async fn main() {
         let msg = connection.update_receiver.recv().await;
         dbg!(msg);
     }
+
     info!("connecting to controller 2");
     let controller2 = manager.connect_controller().await.unwrap();
     dbg!(&controller2);
