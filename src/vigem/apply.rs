@@ -1,50 +1,47 @@
-pub trait ApplyTo<T> {
-    fn apply_to(&self, gamepad: XGamepad);
+use vigem_client::{XButtons, XGamepad};
+
+use crate::bluetooth::state::ControllerState;
+
+pub trait Apply {
+    fn apply(&mut self, gamepad: ControllerState);
 }
 
-impl ApplyTo for XGamepad {
-    fn apply_to(&self, gamepad: XGamepad) {
-        for (button, output) in &[
-            (self.up, XButtons!(UP)),
-            (self.down, XButtons!(DOWN)),
-            (self.left, XButtons!(LEFT)),
-            (self.right, XButtons!(RIGHT)),
-            (self.minus, XButtons!(BACK)),
-            (self.l, XButtons!(LB)),
-            (self.stick, XButtons!(LTHUMB)),
+impl Apply for XGamepad {
+    fn apply(&mut self, state: ControllerState) {
+        for (button, output) in [
+            // left
+            (state.up, XButtons!(UP)),
+            (state.down, XButtons!(DOWN)),
+            (state.left, XButtons!(LEFT)),
+            (state.right, XButtons!(RIGHT)),
+            (state.minus, XButtons!(BACK)),
+            (state.l, XButtons!(LB)),
+            (state.stick_left, XButtons!(LTHUMB)),
+            // right
+            (state.a, XButtons!(B)),
+            (state.b, XButtons!(A)),
+            (state.x, XButtons!(Y)),
+            (state.y, XButtons!(X)),
+            (state.plus, XButtons!(START)),
+            (state.r, XButtons!(RB)),
+            (state.home, XButtons!(GUIDE)),
+            (state.stick_right, XButtons!(RTHUMB)),
         ] {
-            if *button {
-                gamepad.buttons.raw |= output.raw;
+            if button {
+                self.buttons.raw |= output.raw;
             }
         }
-        if self.zl {
-            gamepad.left_trigger = u8::MAX;
-        }
-        gamepad.thumb_lx = (self.stick_x * (i16::MAX as f32)).round() as i16;
-        gamepad.thumb_ly = (self.stick_y * (i16::MAX as f32)).round() as i16;
-    }
-}
 
-impl ApplyTo for RightJoyConState {
-    fn apply_to(&self, gamepad: &mut XGamepad) {
-        for (button, output) in &[
-            (self.a, XButtons!(B)),
-            (self.b, XButtons!(A)),
-            (self.x, XButtons!(Y)),
-            (self.y, XButtons!(X)),
-            (self.plus, XButtons!(START)),
-            (self.r, XButtons!(RB)),
-            (self.home, XButtons!(GUIDE)),
-            (self.stick, XButtons!(RTHUMB)),
-        ] {
-            if *button {
-                gamepad.buttons.raw |= output.raw;
-            }
+        if state.zl {
+            self.left_trigger = u8::MAX;
         }
-        if self.zr {
-            gamepad.right_trigger = u8::MAX;
+        if state.zr {
+            self.right_trigger = u8::MAX;
         }
-        gamepad.thumb_rx = (self.stick_x * (i16::MAX as f32)).round() as i16;
-        gamepad.thumb_ry = (self.stick_y * (i16::MAX as f32)).round() as i16;
+
+        self.thumb_lx = (state.stick_lx * (i16::MAX as f32)).round() as i16;
+        self.thumb_ly = (state.stick_ly * (i16::MAX as f32)).round() as i16;
+        self.thumb_rx = (state.stick_rx * (i16::MAX as f32)).round() as i16;
+        self.thumb_ry = (state.stick_ry * (i16::MAX as f32)).round() as i16;
     }
 }

@@ -1,82 +1,45 @@
 use btleplug::api::ValueNotification;
-use vigem_client::{XButtons, XGamepad};
-
 
 #[derive(Debug)]
 pub struct ControllerState {
-    stick_right: bool,
-    plus: bool,
-    zr: bool,
-    r: bool,
-    x: bool,
-    y: bool,
-    a: bool,
-    b: bool,
-    sl_right: bool,
-    sr_right: bool,
-    c: bool,
-    home: bool,
-    stick_rx: f32,
-    stick_ry: f32,
-    stick_left: bool,
-    minus: bool,
-    zl: bool,
-    l: bool,
-    up: bool,
-    left: bool,
-    right: bool,
-    down: bool,
-    sl_left: bool,
-    sr_left: bool,
-    capture: bool,
-    stick_lx: f32,
-    stick_ly: f32,
-    gl: bool,
-    gr: bool,
+    pub stick_right: bool,
+    pub plus: bool,
+    pub zr: bool,
+    pub r: bool,
+    pub x: bool,
+    pub y: bool,
+    pub a: bool,
+    pub b: bool,
+    pub sl_right: bool,
+    pub sr_right: bool,
+    pub c: bool,
+    pub home: bool,
+    pub stick_rx: f32,
+    pub stick_ry: f32,
+    pub stick_left: bool,
+    pub minus: bool,
+    pub zl: bool,
+    pub l: bool,
+    pub up: bool,
+    pub left: bool,
+    pub right: bool,
+    pub down: bool,
+    pub sl_left: bool,
+    pub sr_left: bool,
+    pub capture: bool,
+    pub stick_lx: f32,
+    pub stick_ly: f32,
+    pub gl: bool,
+    pub gr: bool,
 
     // Motion Data
-    accel_x: f32,
-    accel_y: f32,
-    accel_z: f32,
-    gyro_x: f32,
-    gyro_y: f32,
-    gyro_z: f32,
+    pub accel_x: f32,
+    pub accel_y: f32,
+    pub accel_z: f32,
+    pub gyro_x: f32,
+    pub gyro_y: f32,
+    pub gyro_z: f32,
 }
-
-impl ControllerState {
-    pub fn apply_to(&self, gamepad: &mut XGamepad) {
-        for (button, output) in &[
-            (self.up, XButtons!(UP)),
-            (self.down, XButtons!(DOWN)),
-            (self.left, XButtons!(LEFT)),
-            (self.right, XButtons!(RIGHT)),
-            (self.minus, XButtons!(BACK)),
-            (self.l, XButtons!(LB)),
-            (self.stick_left, XButtons!(LTHUMB)),
-            (self.a, XButtons!(UP)),
-            (self.x, XButtons!(DOWN)),
-            (self.b, XButtons!(LEFT)),
-            (self.y, XButtons!(RIGHT)),
-            (self.plus, XButtons!(BACK)),
-            (self.r, XButtons!(LB)),
-            (self.stick_right, XButtons!(LTHUMB)),
-            (self.home, XButtons!(GUIDE)),
-        ] {
-            if *button { gamepad.buttons.raw |= output.raw; }
-        }
-        if self.zl {
-            gamepad.left_trigger = u8::MAX;
-        }
-        if self.zr {
-            gamepad.right_trigger = u8::MAX;
-        }
-        gamepad.thumb_lx = (self.stick_lx * (i16::MAX as f32)).round() as i16;
-        gamepad.thumb_ly = (self.stick_ly * (i16::MAX as f32)).round() as i16;
-        gamepad.thumb_rx = (self.stick_rx * (i16::MAX as f32)).round() as i16;
-        gamepad.thumb_ry = (self.stick_ry * (i16::MAX as f32)).round() as i16;
-    }
-}
-
 
 impl From<ValueNotification> for ControllerState {
     fn from(notification: ValueNotification) -> Self {
@@ -101,7 +64,6 @@ impl From<ValueNotification> for ControllerState {
             home: (buttons[1] & 0x10) > 0,
             capture: (buttons[1] & 0x20) > 0,
             c: (buttons[1] & 0x40) > 0,
-
 
             down: (buttons[2] & 0x01) > 0,
             up: (buttons[2] & 0x02) > 0,
@@ -129,7 +91,6 @@ impl From<ValueNotification> for ControllerState {
         }
     }
 }
-
 
 fn decode_stick_data(data: &[u8]) -> (f32, f32) {
     const X_STICK_MIN: f32 = 780.0;

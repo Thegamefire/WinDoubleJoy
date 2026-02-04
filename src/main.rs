@@ -2,6 +2,8 @@ use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 
 use crate::bluetooth::manager::BluetoothManager;
+#[cfg(feature = "vigem")]
+use crate::vigem::client::VigemManager;
 
 pub mod bluetooth;
 #[cfg(feature = "vigem")]
@@ -21,17 +23,15 @@ async fn main() {
 
     info!("connecting to controller 1");
     let controller1 = manager.connect_controller().await.unwrap();
-    dbg!(&controller1);
-    if let Some(mut connection) = controller1 {
-        let msg = connection.update_receiver.recv().await;
-        dbg!(msg);
-    }
 
     info!("connecting to controller 2");
     let controller2 = manager.connect_controller().await.unwrap();
-    dbg!(&controller2);
-    if let Some(mut connection) = controller2 {
-        let msg = connection.update_receiver.recv().await;
-        dbg!(msg);
+
+    #[cfg(feature = "vigem")]
+    if let (Some(c1), Some(c2)) = (controller1, controller2) {
+        info!("both controllers connected, starting vigem");
+        let manager = VigemManager::new();
+        let handle = manager.start_thread(c1.update_receiver, c2.update_receiver);
+        handle.await.unwrap();
     }
 }

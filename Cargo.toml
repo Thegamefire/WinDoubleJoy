@@ -5,6 +5,7 @@ edition = "2024"
 
 [features]
 vigem = ["dep:vigem-client"]
+default = ["vigem"]
 
 [dependencies]
 btleplug = "0.11.8"
