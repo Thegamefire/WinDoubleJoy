@@ -21,6 +21,8 @@ use uuid::{Uuid, uuid};
 
 const JOYCONLEFT_UUID: Uuid = uuid!("cc1bbbb5-7354-4d32-a716-a81cb241a32a");
 const JOYCONRIGHT_UUID: Uuid = uuid!("d5a9e01e-2ffc-4cca-b20c-8b67142bf442");
+
+const COMMON_STATE_UUID: Uuid = uuid!("ab7de9be-89fe-49ad-828f-118f09df7fd2");
 const COMMAND_CHARACTERISTIC_UUID: Uuid = uuid!("649d4ac9-8eb7-4e6c-af44-1ea54fe5f005");
 
 const NINTENDO_MANUFACTURER_PREFIX: [u8; 5] = [1, 0, 3, 126, 5];
@@ -116,26 +118,36 @@ impl BluetoothManager {
         );
         for characteristic in peripheral.characteristics() {
             match characteristic.uuid {
-                JOYCONLEFT_UUID => {
-                    info!("left joycon found");
+                COMMON_STATE_UUID => {
+                    info!("Switch2 Controller Found");
                     self.initialize_joycon(&peripheral).await.unwrap();
                     return Ok(Some(
                         subscribe_and_listen(peripheral, characteristic, |msg| {
-                            ControllerState::from(msg) //TODO Listen on Common Characteristic instead of Side-Specific
+                            ControllerState::from(msg)
                         })
                         .await?,
-                    ));
+                    ))
                 }
-                JOYCONRIGHT_UUID => {
-                    info!("right joycon found");
-                    self.initialize_joycon(&peripheral).await.unwrap();
-                    return Ok(Some(
-                        subscribe_and_listen(peripheral, characteristic, |msg| {
-                            ControllerState::from(msg) //TODO Listen on Common Characteristic instead of Side-Specific
-                        })
-                        .await?,
-                    ));
-                }
+                // JOYCONLEFT_UUID => {
+                //     info!("left joycon found");
+                //     self.initialize_joycon(&peripheral).await.unwrap();
+                //     return Ok(Some(
+                //         subscribe_and_listen(peripheral, characteristic, |msg| {
+                //             ControllerState::from(msg) //TODO Listen on Common Characteristic instead of Side-Specific
+                //         })
+                //         .await?,
+                //     ));
+                // }
+                // JOYCONRIGHT_UUID => {
+                //     info!("right joycon found");
+                //     self.initialize_joycon(&peripheral).await.unwrap();
+                //     return Ok(Some(
+                //         subscribe_and_listen(peripheral, characteristic, |msg| {
+                //             ControllerState::from(msg) //TODO Listen on Common Characteristic instead of Side-Specific
+                //         })
+                //         .await?,
+                //     ));
+                // }
                 _ => debug!("skipped characteristic {}", characteristic),
             }
         }
