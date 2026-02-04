@@ -38,10 +38,10 @@ impl Apply for XGamepad {
         if state.zr {
             self.right_trigger = u8::MAX;
         }
+        self.thumb_lx = self.thumb_lx.saturating_add((state.stick_lx * (i16::MAX as f32)).round() as i16);
+        self.thumb_ly = self.thumb_ly.saturating_add((state.stick_ly * (i16::MAX as f32)).round() as i16);
+        self.thumb_rx = self.thumb_rx.saturating_add((state.stick_rx * (i16::MAX as f32)).round() as i16);
+        self.thumb_ry = self.thumb_ry.saturating_add((state.stick_ry * (i16::MAX as f32)).round() as i16);
 
-        self.thumb_lx = (state.stick_lx * (i16::MAX as f32)).round() as i16;
-        self.thumb_ly = (state.stick_ly * (i16::MAX as f32)).round() as i16;
-        self.thumb_rx = (state.stick_rx * (i16::MAX as f32)).round() as i16;
-        self.thumb_ry = (state.stick_ry * (i16::MAX as f32)).round() as i16;
     }
 }
