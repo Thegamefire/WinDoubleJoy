@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::bluetooth::{
     commands::Commands,
     controller::ControllerConnection,
-    state::{ControllerState, LeftJoyConState, RightJoyConState},
+    state::{ControllerState},
 };
 use btleplug::{
     Result as BtleResult,
@@ -121,7 +121,7 @@ impl BluetoothManager {
                     self.initialize_joycon(&peripheral).await.unwrap();
                     return Ok(Some(
                         subscribe_and_listen(peripheral, characteristic, |msg| {
-                            ControllerState::Left(LeftJoyConState::from(msg))
+                            ControllerState::from(msg) //TODO Listen on Common Characteristic instead of Side-Specific
                         })
                         .await?,
                     ));
@@ -131,7 +131,7 @@ impl BluetoothManager {
                     self.initialize_joycon(&peripheral).await.unwrap();
                     return Ok(Some(
                         subscribe_and_listen(peripheral, characteristic, |msg| {
-                            ControllerState::Right(RightJoyConState::from(msg))
+                            ControllerState::from(msg) //TODO Listen on Common Characteristic instead of Side-Specific
                         })
                         .await?,
                     ));
